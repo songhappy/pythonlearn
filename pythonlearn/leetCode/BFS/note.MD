@@ -10,5 +10,16 @@
     deque.append(), deque.pop(), deque.popleft()
     queue.get(), queue.put()
 3. by level VS no level
+    由点到面，每一次一个点，可以省一成循环
 4. graph bfs different from tree bfs cause in graph you need check if it is visited or not, and {}.add(node) and queue.append(node) at the same time
-    n137
+    n433
+5. careful when constructing a graph, could be a root node, could be matrix or dictionaries
+  
+6. toplogical sorted related, need build graph and calculate indegrees, and return an order, eg. n127, n615, n605
+    ask : any top_order n 127
+          is there any top_order n615, 611
+          the only top order, len(queue) > 1, then None n605
+          
+7. bfs related
+    ask: bfs order, return the order n137, n242
+         shortest path, need update visited in bfs or return order. length in n120, distance in n611, visited in n433

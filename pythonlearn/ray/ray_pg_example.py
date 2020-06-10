@@ -5,9 +5,39 @@ import numpy as np
 from keras.layers import Dense
 from keras.models import Sequential
 from keras.optimizers import Adam
-
+import ray
 EPISODES = 1000
+ray.init()
 
+@ray.remote
+class Runner:
+    def __init__(self, agent, nsteps):
+        self.agent = agent
+        self.env = gym.make('CartPole-v1')
+        state = self.env.reset()
+        state_size = self.env.observation_space.shape[0]
+        self.initial_state = np.reshape(state, [1, state_size])
+        self.nsteps = nsteps
+
+    def run(self):
+        # For n in range number of steps
+        next_state = None
+        state_size = self.env.observation_space.shape[0]
+        states, rewards, actions  =[], [], []
+        done = False
+        for _ in range(self.nsteps):
+            if done:
+                state = self.env.reset()
+                self.initial_state = np.reshape(state, [1, state_size])
+                continue
+            current_state = self.initial_state if next_state is None else next_state
+            action = self.agent.get_action(current_state)
+            next_state, reward, done, info = self.env.step(action)
+            next_state = np.reshape(next_state, [1, state_size])
+            states.append(next_state)
+            rewards.append(reward)
+            actions.append(action)
+        return [states, rewards, actions]
 
 # This is Policy Gradient agent for the Cartpole
 # In this example, we use REINFORCE algorithm which uses monte-carlo update rule
@@ -53,12 +83,7 @@ class REINFORCEAgent:
 
     # using the output of policy network, pick action stochastically
     def get_action(self, state):
-        print(state)
         policy = self.model.predict(state, batch_size=1).flatten()
-        print(policy)
-        print(action_size)
-        print(np.random.choice(self.action_size, 1, p=policy))
-        print("------------------")
         return np.random.choice(self.action_size, 1, p=policy)[0]
 
     # In Policy Gradient, Q function is not available.
@@ -80,14 +105,10 @@ class REINFORCEAgent:
     # update policy network every episode
     def train_model(self):
         episode_length = len(self.states)
-
+        # need to be updated according to position of rewards
         discounted_rewards = self.discount_rewards(self.rewards)
         discounted_rewards -= np.mean(discounted_rewards)
         discounted_rewards /= np.std(discounted_rewards)
-        #print("**************************")
-        #print(self.rewards)
-        #print("----------")
-        #print(discounted_rewards)
         update_inputs = np.zeros((episode_length, self.state_size))
         advantages = np.zeros((episode_length, self.action_size))
 
@@ -98,57 +119,36 @@ class REINFORCEAgent:
         self.model.fit(update_inputs, advantages, epochs=1, verbose=0)
         self.states, self.actions, self.rewards = [], [], []
 
-if __name__ == "__main__":
-    # In case of CartPole-v1, you can play until 500 time step
+if __name__ == '__main__':
+        # In case of CartPole-v1, you can play until 500 time step
     env = gym.make('CartPole-v1')
+    env.reset()
     # get size of state and action from environment
     state_size = env.observation_space.shape[0]
     action_size = env.action_space.n
 
     # make REINFORCE agent
     agent = REINFORCEAgent(state_size, action_size)
+    agent_id = ray.put(agent)
+    runners = [Runner.remote(agent, nsteps=512) for i in range(8)]
+    for update in range(20000):
+        results = [r.run.remote() for r in runners]
+        results = ray.get(results)
+        states = []
+        rewards = []
+        actions = []
+        for result in results:
+            for ele in result[0]:
+                states.append(ele)
+            for ele in result[1]:
+                rewards.append(ele)
+            for ele in result[2]:
+                actions.append(ele)
+        agent.rewards = rewards
+        agent.states = states
+        agent.actions = actions
+        agent.train_model()
+        agent_id = ray.put(agent)
 
-    scores, episodes = [], []
 
-    for e in range(EPISODES):
-        done = False
-        score = 0
-        state = env.reset()
-        state = np.reshape(state, [1, state_size])
 
-        while not done:
-            if agent.render:
-                env.render()
-
-            # get action for the current state and go one step in environment
-            action = agent.get_action(state)
-            next_state, reward, done, info = env.step(action)
-            next_state = np.reshape(next_state, [1, state_size])
-            reward = reward if not done or score == 499 else -100
-            # save the sample <s, a, r> to the memory
-            agent.append_sample(state, action, reward)
-
-            score += reward
-            state = next_state
-
-            if done:
-                # every episode, agent learns from sample returns
-                agent.train_model()
-
-                # every episode, plot the play time
-                score = score if score == 500 else score + 100
-                scores.append(score)
-                episodes.append(e)
-                pylab.plot(episodes, scores, 'b')
-                #pylab.show()
-       #         pylab.savefig("./save_graph/cartpole_reinforce.png")
-                print("episode:", e, "  score:", score)
-
-                # if the mean of scores of last 10 episode is bigger than 490
-                # stop training
-                if np.mean(scores[-min(10, len(scores)):]) > 490:
-                    sys.exit()
-
-        # save the model
-        # if e % 50 == 0:
-        #     agent.model.save_weights("./save_model/cartpole_reinforce.h5")

@@ -1,3 +1,7 @@
+# basic style of different sings
+# space after the sign: ","
+# space before: 单元运算符, "-", "!"
+# space before and after + - = except when give default values in functions
 # python numbers
 #int, float and complex how many bytes per each number
 a = 5
@@ -18,11 +22,11 @@ import numpy as np
 import random
 random.seed(1)
 a = random.random() # float [0.0, 1.0)
-b = random.randint(1,10) # int
+b = random.randint(1, 10) # int
 np.random.seed(1)
 am = np.random.random([2,3,4])  #am and cm just different ways to generate float numbers
 cm= np.random.rand(2,3,4)
-bm = np.random.randint(1, 10, [2,3,4])
+bm = np.random.randint(1, 10, [2, 3, 4])
 print("********************")
 print(am)
 print(bm)

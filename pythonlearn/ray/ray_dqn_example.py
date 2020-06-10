@@ -1,14 +1,50 @@
 import random
 import gym
-import numpy as np
 from collections import deque
-from keras.models import Sequential
+import numpy as np
 from keras.layers import Dense
+from keras.models import Sequential
 from keras.optimizers import Adam
+import ray
 import time
 
-EPISODES = 1000000
+EPISODES = 1000
 
+@ray.remote
+class Runner:
+    def __init__(self, nsteps):
+        self.env = gym.make('CartPole-v1')
+        state = self.env.reset()
+        state_size = self.env.observation_space.shape[0]
+        self.initial_state = np.reshape(state, [1, state_size])
+        self.nsteps = nsteps
+
+    def run(self, agent_id):
+        self.agent = agent_id
+        memory = []
+        state = env.reset()
+        state = np.reshape(state, [1, state_size])
+        begin = time.time()
+        for i in range(self.nsteps):
+            # env.render()
+            action = agent.act(state)
+            next_state, reward, done, _ = env.step(action)
+            reward = reward if not done else -10
+            next_state = np.reshape(next_state, [1, state_size])
+            memory.append([state, action, reward, next_state, done])
+            state = next_state
+            if done:
+                state = env.reset()
+                state = np.reshape(state, [1, state_size])
+                # print("score: {}, e: {:.2}"
+                #       .format(i, agent.epsilon))
+                # break
+        end = time.time()
+        print("in worker", end - begin)
+        return memory
+
+# This is Policy Gradient agent for the Cartpole
+# In this example, we use REINFORCE algorithm which uses monte-carlo update rule
 class DQNAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
@@ -59,50 +95,43 @@ class DQNAgent:
 
     def save(self, name):
         self.model.save_weights(name)
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
+    start = time.time()
+    ncpus = 8
+    ray.init(num_cpus=8)
+    # In case of CartPole-v1, you can play until 500 time step
     env = gym.make('CartPole-v1')
-    print(env.__dict__)
+    env.reset()
+    # get size of state and action from environment
     state_size = env.observation_space.shape[0]
     action_size = env.action_space.n
+
+    # make REINFORCE agent
     agent = DQNAgent(state_size, action_size)
-    # agent.load("./save/cartpole-dqn.h5")
-    done = False
-    batch_size = 256
+    agent_id = ray.put(agent)
+    runners = [Runner.remote(nsteps=1000) for i in range(ncpus)]
     sum = 0
-    for i in range(100):
+    for i in range(10):
         memory = []
         start = time.time()
-        for e in range(EPISODES):
-            state = env.reset()
-            state = np.reshape(state, [1, state_size])
-            for i in range(500):
-            # env.render()
-                action = agent.act(state)
-                next_state, reward, done, _ = env.step(action)
-                reward = reward if not done else -10
-                next_state = np.reshape(next_state, [1, state_size])
-                memory.append([state, action, reward, next_state, done])
-                agent.memorize(state, action, reward, next_state, done)
-                state = next_state
-                if done:
-                    state = env.reset()
-                    state = np.reshape(state, [1, state_size])
-                    # print("episode: {}/{}, score: {}, e: {:.2}"
-                    #       .format(e, EPISODES, i, agent.epsilon))
-                    #break
-                batch_size = 32
-
+        for update in range(20000):
+            results = [r.run.remote(agent_id) for r in runners]
+            results = ray.get(results)
+            states, rewards, actions = [], [], []
+            for result in results:
+                for ele in result:
+                    memory.append(ele)
+            agent.memory = memory
+            batch_size = len(memory)
+            agent.train_model(batch_size = batch_size)
+            print(len(memory))
+            agent_id = ray.put(agent)
             if len(memory) >= 8000:
                 break
-            # if len(agent.memory) > batch_size:
-            #     agent.train_model(batch_size)
         end = time.time()
         duration = end - start
         print(duration)
         sum = sum + duration
 
-    print("duration of producing 1000000:", sum / 100)
-        # if e % 10 == 0:
-        #     agent.save("./save/cartpole-dqn.h5")
+    print("duration of producing 1000000:", sum / 10)
+
