@@ -32,7 +32,7 @@ class REINFORCEAgent:
         self.states, self.actions, self.rewards = [], [], []
 
         if self.load_model:
-            self.model.load_weights("./save_model/cartpole_reinforce.h5")
+            self.model.load_weights("../save_model/cartpole_reinforce.h5")
 
     # approximate policy using Neural Network
     # state is input and probability of each action is output of network
@@ -102,8 +102,13 @@ if __name__ == "__main__":
     # In case of CartPole-v1, you can play until 500 time step
     env = gym.make('CartPole-v1')
     # get size of state and action from environment
+    print(env.observation_space)
     state_size = env.observation_space.shape[0]
+    print(state_size)
     action_size = env.action_space.n
+    print(env.action_space)
+    print(action_size)
+    #sys.exit()
 
     # make REINFORCE agent
     agent = REINFORCEAgent(state_size, action_size)
@@ -123,7 +128,10 @@ if __name__ == "__main__":
             # get action for the current state and go one step in environment
             action = agent.get_action(state)
             next_state, reward, done, info = env.step(action)
+            print(next_state)
             next_state = np.reshape(next_state, [1, state_size])
+            print(next_state)
+            sys.exit()
             reward = reward if not done or score == 499 else -100
             # save the sample <s, a, r> to the memory
             agent.append_sample(state, action, reward)

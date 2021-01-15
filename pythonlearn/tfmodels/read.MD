@@ -1,1 +1,1 @@
-1. reinforcement learning models are based on [github](https://github.com/rlcode/reinforcement-learning)
+1. rlmodels using py36tf2 envirorment, based on [github](https://github.com/rlcode/reinforcement-learning)

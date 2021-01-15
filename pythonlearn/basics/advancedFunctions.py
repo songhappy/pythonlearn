@@ -2,7 +2,7 @@
 import tensorflow as tf
 def func1():
     def func2(x):
-        return x
+        return x+1
     return func2
 
 x = func1()(2)
@@ -36,6 +36,7 @@ print(y)
 
 
 def myFun1(**kwargs):
+    print(kwargs)
     for key, value in kwargs.items():
         print("%s == %s" % (key, value))
 myFun1(first='Geeks', mid='for', last='Geeks')
@@ -45,6 +46,9 @@ def myFun(arg1, arg2, arg3):
     print("arg2:", arg2)
     print("arg3:", arg3)
 
+
+def myFun2(*arg):
+    print(arg)
 # Now we can use *args or **kwargs to
 # pass arguments to this function :
 args = ("Geeks", "for", "Geeks")
@@ -55,5 +59,6 @@ myFun1(**kwargs)
 test_keys = ["Rash", "Kil", "Varsha"]
 test_values = [1, 4, 5]
 res = dict(zip(test_keys, test_values))
+myFun2(test_keys)
 
 print(res)

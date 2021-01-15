@@ -4,9 +4,9 @@ import pylab
 import random
 import numpy as np
 from collections import deque
-from keras.layers import Dense
-from keras.optimizers import Adam
-from keras.models import Sequential
+from zoo.pipeline.api.keras.layers import Dense
+from zoo.pipeline.api.keras.optimizers import Adam
+from zoo.pipeline.api.keras.models import Sequential
 
 EPISODES = 300
 
@@ -48,12 +48,9 @@ class DoubleDQNAgent:
     # state is input and Q Value of each action is output of network
     def build_model(self):
         model = Sequential()
-        model.add(Dense(24, input_dim=self.state_size, activation='relu',
-                        kernel_initializer='he_uniform'))
-        model.add(Dense(24, activation='relu',
-                        kernel_initializer='he_uniform'))
-        model.add(Dense(self.action_size, activation='linear',
-                        kernel_initializer='he_uniform'))
+        model.add(Dense(24, input_dim=self.state_size, activation='relu'))
+        model.add(Dense(24, activation='relu'))
+        model.add(Dense(self.action_size, activation='linear'))
         model.summary()
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
         return model
@@ -67,7 +64,7 @@ class DoubleDQNAgent:
         if np.random.rand() <= self.epsilon:
             return random.randrange(self.action_size)
         else:
-            q_value = self.model.predict(state)
+            q_value = self.model.predict(state, distributed=False)#.take(10)
             return np.argmax(q_value[0])
 
     # save sample <s,a,r,s'> to the replay memory
@@ -94,9 +91,15 @@ class DoubleDQNAgent:
             next_state[i] = mini_batch[i][3]
             done.append(mini_batch[i][4])
 
-        q_value = self.model.predict(state)
-        q_next = self.model.predict(next_state)
-        q_target = self.target_model.predict(next_state)
+        q_value = self.model.predict(state, distributed=False)#.take(batch_size)
+        q_next = self.model.predict(next_state, distributed=False)#.take(batch_size)
+        q_target = self.target_model.predict(next_state, distributed=False)#.take(batch_size)
+        q_value = np.vstack(q_value)
+        q_next = np.vstack(q_next)
+        q_target = np.vstack(q_target)
+        # print(q_value)
+        # print(q_next)
+        # print(q_target)
 
         for i in range(self.batch_size):
             # like Q Learning, get maximum Q value at s'
@@ -113,12 +116,18 @@ class DoubleDQNAgent:
 
         # make minibatch which includes target q value and predicted q value
         # and do the model fit!
+        # print(type(state))
+        # print(type(q_value))
+        # print(type(self.batch_size))
         self.model.fit(state, q_value, batch_size=self.batch_size,
-                       epochs=1, verbose=0)
+                       nb_epoch=1, distributed=True)
 
 
 if __name__ == "__main__":
     # In case of CartPole-v1, you can play until 500 time step
+    from zoo.common.nncontext import *
+
+    sc = init_nncontext()
     env = gym.make('CartPole-v1')
     # get size of state and action from environment
     state_size = env.observation_space.shape[0]
@@ -172,4 +181,4 @@ if __name__ == "__main__":
 
         # save the model
         if e % 50 == 0:
-            agent.model.save_weights("./save_model/cartpole_ddqn.h5")
+            agent.model.saveModel("./save_model/cartpole_ddqn.h5", over_write=True)

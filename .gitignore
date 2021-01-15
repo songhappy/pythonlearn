@@ -1,0 +1,7 @@
+debug.log
+bigdl.log
+pythonlearn/data
+pythonlearn/tfmodels/save_model/*
+pythonlearn/tfmodels/save_graph/*
+pythonlearn/zoomodels/save_graph/*
+pythonlearn/zoomodels/save_model/*

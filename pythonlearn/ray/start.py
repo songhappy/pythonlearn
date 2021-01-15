@@ -1,5 +1,12 @@
+from zoo.orca import init_orca_context, stop_orca_context
 import ray
-ray.init()
+from zoo.ray import RayContext
+sc = init_orca_context(cluster_mode="local", cores=8, memory="20g")
+ray_ctx = RayContext(sc=sc, object_store_memory="2g")
+ray_ctx.init()
+
+#import ray
+#ray.init()
 
 @ray.remote
 def f(x):
@@ -23,3 +30,4 @@ counters = [Counter.remote() for i in range(4)]
 [c.increment.remote() for c in counters]
 futures = [c.read.remote() for c in counters]
 print(ray.get(futures))
+ray_ctx.stop()

@@ -121,7 +121,7 @@ if __name__ == "__main__":
                 scores.append(score)
                 episodes.append(e)
                 pylab.plot(episodes, scores, 'b')
-                pylab.savefig("./save_graph/cartpole_a2c.png")
+                pylab.savefig("../save_graph/cartpole_a2c.png")
                 print("episode:", e, "  score:", score)
 
                 # if the mean of scores of last 10 episode is bigger than 490
@@ -131,5 +131,5 @@ if __name__ == "__main__":
 
         # save the model
         if e % 50 == 0:
-            agent.actor.save_weights("./save_model/cartpole_actor.h5")
-            agent.critic.save_weights("./save_model/cartpole_critic.h5")
+            agent.actor.save_weights("../save_model/cartpole_actor.h5")
+            agent.critic.save_weights("../save_model/cartpole_critic.h5")
