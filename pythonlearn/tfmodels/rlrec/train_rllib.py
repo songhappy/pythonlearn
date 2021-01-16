@@ -3,18 +3,23 @@ import ray.rllib.agents.ppo as ppo
 from ray.tune.logger import pretty_print
 from pythonlearn.tfmodels.rlrec.movie_env import *
 import time
+import sys
 
 #ray.init()
 from zoo.ray import RayContext
 from zoo import init_spark_on_local
 
-conf = {"spark.executor.memory": "20g", "spark.driver.memory": "20g"}
-sc = init_spark_on_local(cores=8, conf=conf)
-ray_ctx = RayContext(sc=sc, object_store_memory="2g")
+conf = {"spark.executor.memory": "24g", "spark.driver.memory": "24g"}
+sc = init_spark_on_local(cores=24, conf=conf)
+ray_ctx = RayContext(sc=sc, object_store_memory="4g")
 ray_ctx.init()
 
 config = ppo.DEFAULT_CONFIG.copy()
-config["lr"] = 0.005
+print(sys.argv[1])
+lr = float(sys.argv[1]) * 0.0005
+config["lr"] = lr
+print("learning rate experiment: ", lr)
+
 config["num_gpus"] = 0
 config["num_workers"] = 8
 #config["eager"] = False
@@ -29,7 +34,7 @@ for i in range(1, 10000):
    result = trainer.train()
    print(pretty_print(result))
 
-   if i % 5 == 0:
+   if i % 50 == 0:
        checkpoint = trainer.save()
        print("checkpoint saved at", checkpoint)
 t2 = time.time()
