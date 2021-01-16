@@ -3,6 +3,8 @@ from gym import Env
 import numpy as np
 import sys
 import random
+import pandas
+
 from bigdl.dataset import movielens
 from zoo.examples.textclassification.news20 import get_glove
 import string
@@ -10,7 +12,7 @@ import string
 class MovieEnv(Env):
     def __init__(self, config):
         super(MovieEnv, self).__init__()
-        [self.users, self.movies, self.ratings] = self._get_data()
+        [self.users, self.movies, self.ratings, self._um_relation] = self._get_data()
         self.info = {}
         self.user_num = max(self.users.keys())
         self.movie_num = max((self.movies.keys()))
@@ -50,7 +52,7 @@ class MovieEnv(Env):
     def reset(self):
         self._step = 0
         uid = random.randint(1, self.user_num)
-        mid = random.randint(1, self.movie_num)
+        mid = random.choice(self._um_relation[uid])
         m_vec = np.array([0.0 for _ in range(50)]) if mid not in self.movies.keys() \
             else self.movies[mid]
         self._uid = uid
@@ -68,8 +70,13 @@ class MovieEnv(Env):
 
         # users_dict = {i:np.array([13]) for i in range(len(users_dict))}
         # movie_dict = {i:np.array([4]) for i in range(len(movie_dict))}
+        df = pandas.DataFrame(movielens_data, columns=['uid','mid','rate']) \
+            .groupby('uid')['mid'].apply(list).reset_index(name='mids')
+        um_relation = {}
+        for index, row in df.iterrows():
+            um_relation[row['uid']] = row['mids']
         ratings_data = {(movielens_data[i][0],movielens_data[i][1]): movielens_data[i][2] for i in range(len(movielens_data))}
-        return [users_dict, movie_dict, ratings_data]
+        return [users_dict, movie_dict, ratings_data, um_relation]
 
     def _get_movies(self, embedding_dict, movie_file="./data/movielens/ml-1m/movies.dat"):
         movie_dict = {}
