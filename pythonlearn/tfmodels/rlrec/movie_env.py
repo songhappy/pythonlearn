@@ -4,7 +4,7 @@ import numpy as np
 import sys
 import random
 import pandas
-
+from scipy import spatial
 from bigdl.dataset import movielens
 from zoo.examples.textclassification.news20 import get_glove
 import string
@@ -21,16 +21,22 @@ class MovieEnv(Env):
         self.action_space = spaces.Discrete(self.movie_num)
         self._step = 0
         self._done = False
-        self._uid = random.randint(1, self.user_num)
+        uid = random.randint(1, self.user_num)
+        mids = [random.randint(1, self.movie_num) for _ in range(10)]
+        self._uid = uid
+        self._um_relation = {uid: mids}
+        print("in initial", uid, self._um_relation)
+
 
     def step(self, action):
         assert self._done is not True, ("cannot call step() once episode finished (call reset insead)")
         self._step += 1
+        print("in step", self._um_relation.keys(), self._um_relation)
         reward = self._get_reward(action)
         obs = self._get_obs(action)
         self._curr_obs = obs
         # check if end
-        done = True if self._step > 30 else False
+        done = True if self._step >= 30 else False
         self.info["step"] = self._step
         # get some info
         return obs, reward, done, self.info
@@ -38,25 +44,40 @@ class MovieEnv(Env):
     def _get_reward(self, action):
         uid = self._uid
         mid = action
-        reward = self.ratings[(uid, mid)] if (uid, mid) in self.ratings.keys() else -5.0
+        print("in get_reward", uid, self._um_relation)
+        rate = self.ratings[(uid, mid)] if (uid, mid) in self.ratings.keys() else 0
+        rate = rate if mid not in self._um_relation[uid] else 0
+        m_vecs = self._get_mvecs(self._um_relation[uid])
+        m_action = np.array([0.0 for _ in range(50)]) if mid not in self.movies.keys() \
+            else self.movies[mid]
+
+        similarity = 1 - spatial.distance.cosine(m_action, m_vecs)
+        reward = rate + (1 - np.asscalar(similarity))
+
+        print("rate, similarity, reward", rate, similarity, reward)
         return reward
 
     def _get_obs(self, action):
         uid = self._uid
         mid = action
-        m_vec = np.array([0.0 for _ in range(50)]) if mid not in self.movies.keys() \
-            else self.movies[mid]
-        obs = np.concatenate([self.users[uid], m_vec])
+        mids = self._um_relation[uid]
+        mids.pop(0)
+        mids.append(mid)
+        self._um_relation[uid] = mids
+        obs = self.users[uid]
+        m_vecs = self._get_mvecs(mids)
+        obs = np.concatenate([obs, m_vecs])
         return obs
 
     def reset(self):
         self._step = 0
         uid = random.randint(1, self.user_num)
-        mid = random.choice(self._um_relation[uid])
-        m_vec = np.array([0.0 for _ in range(50)]) if mid not in self.movies.keys() \
-            else self.movies[mid]
+        mids = [random.randint(1, self.movie_num) for _ in range(10)]
         self._uid = uid
-        obs = np.concatenate([self.users[uid], m_vec])
+        self._um_relation = {uid: mids}
+        obs = self.users[uid]
+        m_vecs = self._get_mvecs(mids)
+        obs = np.concatenate([obs, m_vecs])
         return obs
 
     def render(self, mode='human'):
@@ -115,3 +136,11 @@ class MovieEnv(Env):
             user_f.close()
         return user_dict
 
+    def _get_mvecs(self, mids):
+        m_vecs = []
+        for mid in mids:
+            m_vec = np.array([0.0 for _ in range(50)]) if mid not in self.movies.keys() \
+                else self.movies[mid]
+            m_vecs.append(m_vec)
+        m_vecs = sum(m_vecs)
+        return m_vecs

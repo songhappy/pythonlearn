@@ -10,18 +10,18 @@ from zoo.ray import RayContext
 from zoo import init_spark_on_local
 
 conf = {"spark.executor.memory": "24g", "spark.driver.memory": "24g"}
-sc = init_spark_on_local(cores=24, conf=conf)
+sc = init_spark_on_local(cores=1, conf=conf)
 ray_ctx = RayContext(sc=sc, object_store_memory="4g")
 ray_ctx.init()
 
 config = ppo.DEFAULT_CONFIG.copy()
 print(sys.argv[1])
-lr = float(sys.argv[1]) * 0.0005
+lr = float(sys.argv[1]) * 0.001
 config["lr"] = lr
 print("learning rate experiment: ", lr)
 
 config["num_gpus"] = 0
-config["num_workers"] = 8
+config["num_workers"] = 1
 #config["eager"] = False
 config["env"]=MovieEnv
 
@@ -30,7 +30,7 @@ trainer = ppo.PPOTrainer(config=config)
 
 t1 = time.time()
 for i in range(1, 10000):
-   # Perform one iteration of training the policy with PPO
+   # Perform one iteration of training the policy with PPOvi run
    result = trainer.train()
    print(pretty_print(result))
 
