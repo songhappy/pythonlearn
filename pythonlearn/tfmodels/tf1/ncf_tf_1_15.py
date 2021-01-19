@@ -88,3 +88,15 @@ if __name__ == '__main__':
 
         test = model.predict([np.array([1]), np.array([1])])
         print(test)
+
+    # for i, layer in enumerate(model.layers):
+    #     print(i)
+    #     print(layer.get_weights())
+
+    layer_user = model.get_layer("user_embedding")
+    layer_item = model.get_layer("item_embedding")
+
+    print(layer_user)
+    print(layer_user.get_weights()[0])
+    print(type(layer_user.get_weights()[0]))
+    print(layer_user.get_weights()[0].shape)
