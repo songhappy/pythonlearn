@@ -25,13 +25,10 @@ class MovieEnv(Env):
         mids = [random.randint(1, self.movie_num) for _ in range(10)]
         self._uid = uid
         self._um_relation = {uid: mids}
-        print("in initial", uid, self._um_relation)
-
 
     def step(self, action):
         assert self._done is not True, ("cannot call step() once episode finished (call reset insead)")
         self._step += 1
-        print("in step", self._um_relation.keys(), self._um_relation)
         reward = self._get_reward(action)
         obs = self._get_obs(action)
         self._curr_obs = obs
@@ -44,17 +41,18 @@ class MovieEnv(Env):
     def _get_reward(self, action):
         uid = self._uid
         mid = action
-        print("in get_reward", uid, self._um_relation)
         rate = self.ratings[(uid, mid)] if (uid, mid) in self.ratings.keys() else 0
         rate = rate if mid not in self._um_relation[uid] else 0
         m_vecs = self._get_mvecs(self._um_relation[uid])
+
         m_action = np.array([0.0 for _ in range(50)]) if mid not in self.movies.keys() \
             else self.movies[mid]
 
-        similarity = 1 - spatial.distance.cosine(m_action, m_vecs)
-        reward = rate + (1 - np.asscalar(similarity))
+        similarity = 1 - spatial.distance.cosine(m_action, m_vecs) if mid in self.movies.keys() \
+            else 1
+        reward = rate + (1 - similarity)
 
-        print("rate, similarity, reward", rate, similarity, reward)
+        #print("rate, similarity, reward", rate, similarity, reward)
         return reward
 
     def _get_obs(self, action):
