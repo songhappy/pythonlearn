@@ -46,7 +46,7 @@ ncf.fit(train_rdd,
         batch_size= 8000,
         validation_data=val_rdd)
 
-ncf.save_model("./save_model/movie_ncf.zoomodel")
+ncf.save_model("../save_model/movie_ncf.zoomodel", over_write=True)
 #
 weights = ncf.get_weights()
 # print(weights)
@@ -56,8 +56,9 @@ for i, weight in enumerate(weights):
     print(i)
     print(weight.shape)
 #
-# user_embed = ncf.get_weights()[0]
-# print(user_embed.shape)
+loaded = ncf.load_model("../save_model/movie_ncf.zoomodel")
+user_embed = loaded.get_weights()[0]
+print(user_embed.shape)
 #
-# item_embed = ncf.get_weights()[3]
-# print(item_embed.shape)
+item_embed = loaded.get_weights()[1]
+print(item_embed.shape)

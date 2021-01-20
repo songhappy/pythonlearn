@@ -15,8 +15,9 @@ ray_ctx = RayContext(sc=sc, object_store_memory="4g")
 ray_ctx.init()
 
 config = a2c.A2C_DEFAULT_CONFIG.copy()
-print(sys.argv[1])
-lr = float(sys.argv[1]) * 0.0005
+# print(sys.argv[1])
+# lr = float(sys.argv[1]) * 0.0005
+lr = 0.0005
 config["lr"] = lr
 print("learning rate experiment: ", lr)
 

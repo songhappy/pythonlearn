@@ -8,6 +8,7 @@ from scipy import spatial
 from bigdl.dataset import movielens
 from zoo.examples.textclassification.news20 import get_glove
 import string
+from zoo.models.recommendation import NeuralCF
 
 class MovieEnv(Env):
     def __init__(self, config):
@@ -17,7 +18,7 @@ class MovieEnv(Env):
         self.user_num = max(self.users.keys())
         self.movie_num = max((self.movies.keys()))
         self.rating_num = len(self.ratings)
-        self.observation_space = spaces.Box(-3.4028234663852886e+38, 3.4028234663852886e+38, (53,))
+        self.observation_space = spaces.Box(-3.4028234663852886e+38, 3.4028234663852886e+38, (40,))
         self.action_space = spaces.Discrete(self.movie_num)
         self._step = 0
         self._done = False
@@ -45,7 +46,7 @@ class MovieEnv(Env):
         rate = rate if mid not in self._um_relation[uid] else 0
         m_vecs = self._get_mvecs(self._um_relation[uid])
 
-        m_action = np.array([0.0 for _ in range(50)]) if mid not in self.movies.keys() \
+        m_action = np.array([0.0 for _ in range(20)]) if mid not in self.movies.keys() \
             else self.movies[mid]
 
         similarity = 1 - spatial.distance.cosine(m_action, m_vecs) if mid in self.movies.keys() \
@@ -84,8 +85,10 @@ class MovieEnv(Env):
     def _get_data(self):
         glove_data = get_glove(base_dir="./data/glove.6B", dim=50)
         movielens_data = movielens.get_id_ratings("./data/movielens/")
-        users_dict = self._get_users()
-        movie_dict = self._get_movies(glove_data)
+        # users_dict = self._get_users()
+        # movie_dict = self._get_movies(glove_data)
+
+        users_dict, movie_dict = self._get_embeddings()
 
         # users_dict = {i:np.array([13]) for i in range(len(users_dict))}
         # movie_dict = {i:np.array([4]) for i in range(len(movie_dict))}
@@ -97,7 +100,7 @@ class MovieEnv(Env):
         ratings_data = {(movielens_data[i][0],movielens_data[i][1]): movielens_data[i][2] for i in range(len(movielens_data))}
         return [users_dict, movie_dict, ratings_data, um_relation]
 
-    def _get_movies(self, embedding_dict, movie_file="./data/movielens/ml-1m/movies.dat"):
+    def _get_movies1(self, embedding_dict, movie_file="./data/movielens/ml-1m/movies.dat"):
         movie_dict = {}
         with open(movie_file, encoding='latin-1') as movie_f:
             for line in movie_f:
@@ -121,7 +124,7 @@ class MovieEnv(Env):
             movie_f.close()
         return movie_dict
 
-    def _get_users(self, user_file ="./data/movielens/ml-1m/users.dat"):
+    def _get_users1(self, user_file ="./data/movielens/ml-1m/users.dat"):
         user_dict = {}
         with open(user_file) as user_f:
             for line in user_f:
@@ -137,8 +140,28 @@ class MovieEnv(Env):
     def _get_mvecs(self, mids):
         m_vecs = []
         for mid in mids:
-            m_vec = np.array([0.0 for _ in range(50)]) if mid not in self.movies.keys() \
+            m_vec = np.array([0.0 for _ in range(20)]) if mid not in self.movies.keys() \
                 else self.movies[mid]
             m_vecs.append(m_vec)
         m_vecs = sum(m_vecs)
         return m_vecs
+
+    def _get_embeddings(self):
+        ncf = NeuralCF(user_count=6040,
+               item_count=3952,
+               class_num=5,
+               hidden_layers=[20, 10],
+               include_mf = False)
+        loaded = ncf.load_model("/Users/guoqiong/intelWork/git/learn/pythonlearn/pythonlearn/zoomodels/save_model/movie_ncf.zoomodel")
+        user_embed = loaded.get_weights()[0]
+        print(user_embed.shape)
+        item_embed = loaded.get_weights()[1]
+        print(item_embed.shape)
+        user_dict = {}
+        for i in range(1,6041):
+            user_dict[i] = user_embed[i][:]
+
+        item_dict = {}
+        for i in range(1, 3953):
+            item_dict[i] = item_embed[i][:]
+        return(user_dict, item_dict)
