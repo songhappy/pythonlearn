@@ -4,8 +4,8 @@ def func1():
     def func2(x):
         return x+1
     return func2
-
-x = func1()(2)
+new_func = func1()
+x = (2)
 print(x)
 
 def func3(x):

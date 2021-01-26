@@ -7,10 +7,10 @@ import sys
 
 #ray.init()
 from zoo.ray import RayContext
-from zoo import init_spark_on_local
+from zoo import init_spark_on_local,init_spark_on_yarn
 
 conf = {"spark.executor.memory": "24g", "spark.driver.memory": "24g"}
-sc = init_spark_on_local(cores=8, conf=conf)
+sc = init_spark_on_yarn(cores=8, conf=conf)
 ray_ctx = RayContext(sc=sc, object_store_memory="4g")
 ray_ctx.init()
 
