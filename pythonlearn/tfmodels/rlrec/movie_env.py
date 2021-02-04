@@ -5,12 +5,30 @@ import pandas
 from scipy import spatial
 from bigdl.dataset import movielens
 from collections import deque
+import numpy as np
 from pythonlearn.tfmodels.rlrec.utils import *
-from zoo.examples.textclassification.news20 import get_glove
 
-class EnvConfig(object):
-    def __init__(self, values= None):
-        self._values = {
+# class EnvConfig(object):
+#     def __init__(self, values= None):
+#         self._values = {
+#             'user_max': 6040,
+#             'movie_max': 3952,
+#             'rate_dim': 5,
+#             'glove_dim': 50,
+#             'ncf_embed': True,
+#             'user_dim': 20, # if not ncf_embed, user_dim =30 from one hot
+#             'movie_dim': 20,
+#             'ncf_model_path': "/Users/guoqiong/intelWork/git/learn/pythonlearn/pythonlearn/zoomodels/save_model/movie_ncf.zoomodel",
+#             'episode_length': 30,
+#             'history_length' :10
+#         }
+#         if values:
+#             self._values.update(values)
+
+class MovieEnv(Env):
+    def __init__(self, config):
+        super(MovieEnv, self).__init__()
+        self._config = {
             'user_max': 6040,
             'movie_max': 3952,
             'rate_dim': 5,
@@ -20,15 +38,7 @@ class EnvConfig(object):
             'movie_dim': 20,
             'ncf_model_path': "/Users/guoqiong/intelWork/git/learn/pythonlearn/pythonlearn/zoomodels/save_model/movie_ncf.zoomodel",
             'episode_length': 30,
-            'history_length' :10
-        }
-        if values:
-            self._values.update(values)
-
-class MovieEnv(Env):
-    def __init__(self, config = None):
-        super(MovieEnv, self).__init__()
-        self._config = config
+            'history_length' :10}
         [self.users, self.movies, self.ratings, self._user_movies_env] = self._get_data()
         self.info = {}
         obs_dim = self._config["user_dim"] + self._config["movie_dim"]
@@ -103,7 +113,7 @@ class MovieEnv(Env):
         if (self._config["ncf_embed"]):
             users_dict, movie_dict = self._get_embed_ncf()
         else:
-            # users_dict = encode_user_embed(user_file ="./data/movielens/ml-1m/users.dat")
+            users_dict = encode_user_embed(user_file ="./data/movielens/ml-1m/users.dat")
             movie_dict = self._get_movies_embed_glove(movie_file="./data/movielens/ml-1m/movies.dat",
                                                      embed_dim = self._config['glove_dim'])
 
@@ -145,7 +155,7 @@ class MovieEnv(Env):
         return(user_dict, item_dict)
 
     def _get_movies_embed_glove(movie_file="./data/movielens/ml-1m/movies.dat", embed_dim = 50):
-        assert()
+        from zoo.examples.textclassification.news20 import get_glove
         glove_dict = get_glove(base_dir="./data/glove.6B", dim=embed_dim)
         movie_dict = {}
         with open(movie_file, encoding='latin-1') as movie_f:

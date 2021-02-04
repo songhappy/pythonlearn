@@ -1,7 +1,11 @@
 import sys
 import numpy as np
 import os
-from zoo.models.recommendation.utils import categorical_from_vocab_list
+def categorical_from_vocab_list(sth, vocab_list, default=-1, start=0):
+    if sth in vocab_list:
+        return vocab_list.index(sth) + start
+    else:
+        return default + start
 
 def custom_text_to_sequence(input_text,
                             filters='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n',

@@ -14,13 +14,13 @@ sc = init_spark_on_local(cores=8, conf=spark_conf)
 ray_ctx = RayContext(sc=sc, object_store_memory="4g")
 ray_ctx.init()
 
-env_conf= EnvConfig({'user_max': 6040,
-          'movie_max': 3952,
-          'ncf_dim':20
-          })
+# env_conf= EnvConfig({'user_max': 6040,
+#           'movie_max': 3952,
+#           'ncf_dim':20
+#           })
 
 trainer_conf = a2c.A2C_DEFAULT_CONFIG.copy()
-trainer_conf["env_config"] = env_conf._values
+#trainer_conf["env_config"] = env_conf._values
 # print(sys.argv[1])
 # lr = float(sys.argv[1]) * 0.0005
 lr = 0.0005
