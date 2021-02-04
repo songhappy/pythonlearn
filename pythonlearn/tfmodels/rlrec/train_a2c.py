@@ -9,24 +9,27 @@ import sys
 from zoo.ray import RayContext
 from zoo import init_spark_on_local
 
-conf = {"spark.executor.memory": "24g", "spark.driver.memory": "24g"}
-sc = init_spark_on_local(cores=8, conf=conf)
+spark_conf = {"spark.executor.memory": "24g", "spark.driver.memory": "24g"}
+sc = init_spark_on_local(cores=8, conf=spark_conf)
 ray_ctx = RayContext(sc=sc, object_store_memory="4g")
 ray_ctx.init()
 
-config = a2c.A2C_DEFAULT_CONFIG.copy()
+env_conf= EnvConfig({'user_max': 6040,
+          'movie_max': 3952,
+          'ncf_dim':20
+          })
+
+trainer_conf = a2c.A2C_DEFAULT_CONFIG.copy()
+trainer_conf["env_config"] = env_conf._values
 # print(sys.argv[1])
 # lr = float(sys.argv[1]) * 0.0005
 lr = 0.0005
-config["lr"] = lr
-print("learning rate experiment: ", lr)
+trainer_conf["lr"] = lr
+trainer_conf["num_gpus"] = 0
+trainer_conf["num_workers"] = 8
+trainer_conf["env"]=MovieEnv
 
-config["num_gpus"] = 0
-config["num_workers"] = 8
-#config["eager"] = False
-config["env"]=MovieEnv
-
-trainer = a2c.A2CTrainer(config=config)
+trainer = a2c.A2CTrainer(config=trainer_conf)
 # Can optionally call trainer.restore(path) to load a checkpoint.
 
 t1 = time.time()
@@ -58,3 +61,4 @@ print("total time", t2-t1)
 #
 
 ray_ctx.stop()
+sc.stop()

@@ -150,7 +150,7 @@ X_file = open(path0 +"demofile2.txt", 'rb')
 X = pickle.load(X_file)
 print(X)
 
-#pyspark read and write textfile
+# pyspark read and write textfile
 # rdd.coalesce(1).saveAsTextFile(...)
 # users = sc.textFile("/tmp/movielens/ml-1m/users.dat") \
 #     .map(lambda l: l.split("::")[0:4])\

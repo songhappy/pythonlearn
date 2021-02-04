@@ -47,7 +47,7 @@ model.summary()
 # compile the model
 model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics=['accuracy'])
 history = model.fit(X_train, Y_train,
-                    batch_size=batch_size, nb_epoch=nb_epoch,
+                    batch_size=batch_size, epochs=nb_epoch,
                     verbose=1, validation_data=(X_test, Y_test))
 
 
@@ -69,3 +69,17 @@ model.save_weights('mnist_Logistic_wts.h5')
 # model = model_from_json(open('my_model_architecture.json').read())
 # model = model_from_yaml(open('my_model_architecture.yaml').read())
 # model.load_weights('my_model_weights.h5')
+y=model.predict(X_test)
+print(y.shape)
+y_classes=np.argmax(model.predict(X_test), axis=-1)
+print(type(y_classes))
+print(y_classes[1:10])
+print(type(y_test))
+print(y_test[:10])
+comparison = list(zip(list(y_test), list(y_classes)))
+print(comparison)
+print(len(comparison))
+print(len(y_classes))
+print(len(y_test))
+for (i,j) in comparison[:10]:
+    print(i, j)

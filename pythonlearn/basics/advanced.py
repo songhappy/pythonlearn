@@ -1,61 +1,7 @@
+# https://www.youtube.com/playlist?list=PLqnslRFeH2UqLwzS0AwKDKLrpYBKzLBy2
+
 import sys
 from functools import reduce
-
-x, y = 1, 100
-mylyst = [1,2,3]
-#In a function call:
-# * unpacks a list or tuple into position arguments.
-# ** unpacks a dictionary into keyword arguments.
-lis=[1, 2, 3, 4]
-dic={'a': 10, 'b':20}
-(1, 2, 3, 4)
-{'a': 10, 'b': 20}
-newlist = [*mylyst, 100, 200]
-# Inside a function header:
-# * collects all the positional arguments in a tuple.
-# ** collects all the keyword arguments in a dictionary.
-def functionA(*a, **kw):
-       print(a)
-       print(kw)
-functionA(1, 2, 3, 4, 5, 6, a=2, b=3, c=5)
-(1, 2, 3, 4, 5, 6)
-{'a': 2, 'c': 5, 'b': 3}
-functionA(*lis, **dic)  #it is similar to functionA(1, 2, 3, 4, a=10, b=20)
-
-
-# define a class inside a function
-def build_trainer(name):
-       class trainer_cls():
-              def __init__(self, config):
-                     pass
-              def _train(self):
-                     pass
-       trainer_cls.__name = name
-       trainer_cls.__qualname__ = name
-       return trainer_cls
-A2cTrainer = build_trainer("a2c") # works as a class constructor, not an object constructor
-trainer = A2cTrainer(config = "blabla")
-
-# define a function inside a function
-def func1():
-    def func2(x):
-        return x+1
-    return func2
-new_func = func1()
-x = (2)
-print(x)
-
-# define a function inside a function
-class PolicyWithValue():
-       pass
-def build_policy(env, policy_network, value_work=None):
-       def policy_fn(nbath=None,nstes=None):
-              policy = PolicyWithValue(env=env)
-              pass
-              return policy
-       return policy_fn()
-
-
 
 # inspect
 import inspect
@@ -89,6 +35,8 @@ print(t.wy)
 t.show()
 t.add_attribute()
 print(t.z)
+
+
 # meta class can change the class atribute and force in different ways in different user iterface
 class Meta(type):
        def __new__(self, class_name, bases, attrs):
@@ -136,31 +84,13 @@ def test():
        time.sleep(2)
 test()
 
+
 # generators
 x = [i**2 for i in range(10)]  # take too much memory
-class Gen: # let you look at one value at a time
-       def __init__(self, n):
-              self.n = n
-              self.last = 0
-       def __next__(self):
-              return self.next()
-       def next(self):
-              if self.last == self.n:
-                     raise StopIteration()
-              rv = self.last ** 2
-              self.last += 1
-              return rv
-g = Gen(100)
-while True:
-       try:
-              print(next(g))
-       except StopIteration:
-              break
-# same as
 def gen(n):
        for i in range(n):
               yield i**2  # pause
-g = gen(1000000)
+g = gen(10)
 print(next(g))   # next is defined in builtin
 print(next(g))
 print(sys.getsizeof(g))
@@ -168,26 +98,45 @@ my_generator = (i for i in range(10) if i %2 ==0)
 for i in my_generator:
        print(i)
 
+print(sorted(gen(4)))
+print(sum(gen(4)))
+
+def countdown(num):
+       while num > 0:
+              yield num
+              num -= 1
+cd = countdown(4)
+value = next(cd)
+print(next(cd))
+print(sum(countdown(4)))
+print(sorted(countdown(4)))
+
+def firstn(n):
+       num = 0
+       while num < n:
+              yield num
+              num += 1
+print(sum(firstn(10)))
+
+
 # context managers
+# allocate and release resources precisely when you want to.
 # using with, it will close this file at the end no matter break or not
 with open("file.txt", "w") as file:
        file.write("hello")
+# other examples, lock, lock.aqure, lock.release, with
+# own context manager
+from contextlib import contextmanager
+@contextmanager
+def open_managed_file(filename):
+       f = open(filename, 'w')
+       try:
+              yield f
+       finally:
+              f.close()
+with open_managed_file('file.txt') as f:
+       f.write('some thing')
 
-# lumbda function
-# lambda arguments: expression, usually used only once in the code or as argument for sorted, map, filter and reduce
-mult = lambda x,y: x*y
-mult(5,10)
-prints2D = [(1,2),(15,1),(5,-1),(10,4)]
-sorted = sorted(prints2D, key=lambda x: x[0]+x[1])
-# map(func, seq)
-a = [1,2,3,4,5]
-b = map(lambda x: x*2, a)
-c = map(lambda x: x%2 ==0, a)
-c = [x for x in a if x%2==0]
-#reduce(func, seq)
-print(list(b))
-d = reduce(lambda x,y: x*y, a)
-print(d)
 
 # random numbers
 import random
@@ -204,7 +153,7 @@ a = secrets.choice(mylyst)
 print(a)
 
 import numpy as np
-np.random.seed(1)  # reduceable
+np.random.seed(1)  # reproduceable
 a = np.random.rand(3)
 print(a)
 a = np.random.randint(0,10,(3,4))
@@ -213,4 +162,119 @@ arr = np.array([[1,2,3],[4,5,6],[7,8,9]])
 print(arr)
 np.random.shuffle(arr)
 print(arr)
+
+
+# copy, shallow copy and deep copy
+# Making a shallow copy of an object won’t clone child objects. Therefore, the copy is not fully independent of the original.
+# A shallow copy means constructing a new collection object and then populating it with references to the child objects found in the original. In essence, a shallow copy is only one level deep. The copying process does not recurse and therefore won’t create copies of the child objects themselves.
+# A deep copy makes the copying process recursive. It means first constructing a new collection object and then recursively populating it with copies of the child objects found in the original. Copying an object this way walks the whole object tree to create a fully independent clone of the original object and all of its children.
+import copy
+org = [0,1,2,3,4]
+cpy = org  # copy, point to the same object, org will change if cpy change
+cpy[0] = -10
+print(org)
+cpy = copy.copy(org) # shallow copy, orginal does not get affected at first level
+cpy = org[:]
+cpy = list(org)
+cpy[0] = -10
+print(org) # not affected
+
+org = [[0,1,2,3,4],[5,6,7,8]]
+cpy = copy.copy(org)
+cpy[0][1] ='X'
+print(cpy)
+print(org) # affected, because shallow copy only has one level deep
+
+class Person:
+       def __init__(self, name, age):
+           self.name = name
+           self.age = age
+p1 = Person('alex', 27)
+p2 = copy.copy(p1)
+p2.age = 28
+print(p1.age)  # not affected
+print(p2.age)
+
+p2 = copy.deepcopy(p1)
+p2.age = 28
+print(p1.age)  # not affected
+print(p2.age)
+
+p2 = p1
+p2.age = 28
+print(p1.age)  # affected
+print(p2.age)
+
+
+# collections, Counter, namedtuple, OderedDict, deque
+from collections import Counter
+a = 'aaabbbbbccccccc'
+my_counter = Counter(a)
+print(my_counter.items())
+mydict = dict(my_counter)
+print(my_counter.most_common(2)[0][0])
+print(list(a))
+
+from collections import namedtuple
+Point = namedtuple('Point', 'x,y') #created a class Point with fields of x and y
+pt = Point(1, -4)
+print(pt)
+print(pt.x, pt.y)
+
+from collections import OrderedDict # like a dict, remender the order to be inserted
+keys = list('acb')
+values = [1,2,3]
+mydict = dict(zip(keys, values))
+print(mydict)
+ordered_dict = OrderedDict(mydict)
+print(ordered_dict)
+from collections import defaultdict
+d = defaultdict(lambda : -1) # if key not found return -1
+d = defaultdict(int) # if key not found, return 0
+d['a'] = 1
+print(d['a'])
+print(d['c'])
+
+from collections import deque
+d = deque()
+d.append(1)
+d.append(2)
+d.appendleft(3)
+print(d)
+d.pop()
+d.popleft()
+d.clear()
+d.extend([5,6,7])
+d.extendleft([-1,-2])
+print(d)
+d.rotate(2) # rotate right 2 elements to left position
+
+
+#string: ordered mutable text representation
+mystring = "hello world"
+substring = mystring[::2] # 2 here is step, from beginning to end
+print(substring)
+print(mystring[::-1])
+mystring.replace('world', 'universe')
+mylist = mystring.strip().split()
+print(mylist)
+mystring2 = ' '.join(mylist)
+print(mystring2)
+var = 'good'
+# format string, %, .format(), f-strings
+mystring = "the variable is %s" % var  # f for float, d for integer  decimal value
+print(mystring)
+var1 = 3.1415
+var2 = 5.15
+mystring = "the numbers are {:.2f} and {}".format(var1, var2)  # new way to condtruct string
+print(mystring)
+mystring = f"the numbers are {var1} and {var2}"  # new way to condtruct string
+print(mystring)
+i = 10
+print(f'the number is {i}, squared is {i**2}')
+
+print ("%03d" % (1,))
+print("{:03d}".format(1))
+print(f"{1:.2f}")
+
 
