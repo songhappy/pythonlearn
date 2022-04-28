@@ -24,15 +24,15 @@ class Solution:
         node_indgrees = self.get_indegrees(graph)
         start_nodes = [node for node in graph if node_indgrees[node] == 0]
         queue = collections.deque(start_nodes)
-        order = []  # always give results at when popout
+        result = []  # always give results at when popout
         while queue:
             node = queue.popleft()
-            order.append(node)
+            result.append(node)
             for neigbor in node.neighbors:
                 node_indgrees[neigbor] -= 1
                 if node_indgrees[neigbor] == 0:
                     queue.append(neigbor)
-        return order
+        return result
 
     def get_indegrees(self, graph):
         node_indgrees = {}

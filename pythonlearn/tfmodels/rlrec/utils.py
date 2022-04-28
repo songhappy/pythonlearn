@@ -1,9 +1,12 @@
+
+# create dataframe pyspark
+#  https://sparkbyexamples.com/spark/different-ways-to-create-a-spark-dataframe/\
 import sys
 import numpy as np
 import os
 from zoo.examples.textclassification.news20 import get_glove
 
-def categorical_from_vocab_list(sth, vocab_list, default=-1, start=0):
+def categorical_from_vocab_list(sth, vocab_list, default=0, start=1):
     if sth in vocab_list:
         return vocab_list.index(sth) + start
     else:
@@ -26,7 +29,6 @@ def one_hot_encode(item, item_list):
     encoded = [int(0) for _ in range(len(item_list))]
     encoded[idx] = 1
     return np.array(encoded)
-
 
 def encode_ml_users(user_file ="./data/movielens/ml-1m/users.dat"):
     # feature length = 30
@@ -66,6 +68,5 @@ def encode_ml_movie(movie_file="./data/movielens/ml-1m/movies.dat", embed_dim = 
             movie_embed = [item / count for item in movie_embed]
             movie_dict[int(key)] = np.array(movie_embed)
     return movie_dict
-
 
 cosine = lambda vA,vB:  np.dot(vA, vB) / (np.sqrt(np.dot(vA,vA)) * np.sqrt(np.dot(vB,vB)))

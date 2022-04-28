@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import tensorflow as tf
 
-from tensorflow.python.keras import layers
+from tensorflow.keras import layers
 
 import logging
 logger = tf.get_logger()

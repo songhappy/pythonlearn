@@ -1,4 +1,4 @@
-import  collections
+import collections
 class Solution:
     """
     @param: numCourses: a total of n courses
@@ -18,7 +18,7 @@ class Solution:
 
         graph = {i: [] for i in range(numCourses)}
         indegrees = {i: 0 for i in range(numCourses)}
-        for [neighbor, node] in prerequisites:
+        for [node, neighbor] in prerequisites:
             graph[node].append(neighbor)
             indegrees[neighbor] += 1
         order = self.top_sort(graph, indegrees)
@@ -50,7 +50,7 @@ class Solution2:
 
     def findOrder(self, numCourses, prerequisites):
         # write your code here
-        if len(prerequisites) == 0:  return [i for i in range(numCourses)]
+        if len(prerequisites) == 0: return [i for i in range(numCourses)]
         graph = {i: [] for i in range(numCourses)}
         indegrees = {i: 0 for i in range(numCourses)}
         for [neighbor, node] in prerequisites:

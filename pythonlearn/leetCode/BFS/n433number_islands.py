@@ -43,5 +43,30 @@ class Solution:
         return True
 
 
+class Solution1:
+    def numIslands(self, grid) -> int:
+        if not grid or len(grid) == 0: return 0
+
+        num = 0
+        m = len(grid)
+        n = len(grid[0])
+
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == "1":
+                    num += 1
+                    self.dfs(grid, i, j)
+        return num
+
+    def dfs(self, grid, i, j):
+        if i >= len(grid) or i < 0: return
+        if j >= len(grid[0]) or j < 0: return
+        if grid[i][j] == "0": return
+
+        grid[i][j] = '0'
+        self.dfs(grid, i - 1, j)
+        self.dfs(grid, i + 1, j)
+        self.dfs(grid, i, j - 1)
+        self.dfs(grid, i, j + 1)
 
 

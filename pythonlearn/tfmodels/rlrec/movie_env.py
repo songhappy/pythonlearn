@@ -18,7 +18,7 @@ class EnvConfig(object):
             'ncf_embed': False,
             'user_dim': 30, # if ncf_embed user_dim =20 ; else user_dim = 30
             'movie_dim': 50, # if ncf_embed, movie_dim =30 ; else movie_dim = glove_dim = 50
-            'ncf_model_path': "/Users/guoqiong/intelWork/git/learn/pythonlearn/pythonlearn/zoomodels/save_model/movie_ncf.zoomodel",
+            'ncf_model_path': "/Users/guoqiong/intelWork/git/learn/pythonlearn/pythonlearn/bigdlmodels/save_model/movie_ncf.zoomodel",
             'episode_length': 30,
             'history_length' :10
         }

@@ -40,33 +40,6 @@ class Solution:
             res.append(dummy.next)
         return res
 
-    def binaryTreeToLists2(self, root):
-        result = []
-        if root is None: return result
-
-        import queue
-        queue = queue.Queue()
-        queue.put(root)
-
-        dummy = ListNode(0)
-
-        while not queue.empty():
-            p = dummy
-            size = queue.qsize()
-            for i in range(size):
-                head = queue.get()
-                p.next = ListNode(head.val)
-                p = p.next
-
-                if head.left is not None:
-                    queue.put(head.left)
-                if head.right is not None:
-                    queue.put(head.right)
-
-            result.append(dummy.next)
-
-        return result
-
     def binaryTreeToLists(self, root):
         result = []
         if root is None: return result

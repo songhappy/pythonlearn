@@ -10,7 +10,7 @@
     deque.append(), deque.pop(), deque.popleft()
     queue.get(), queue.put()
 3. by level VS no level
-    由点到面，每一次一个点，可以省一成循环
+    由点到面，每一次一个点，可以省一层循环
 4. graph bfs different from tree bfs cause in graph you need check if it is visited or not, and {}.add(node) and queue.append(node) at the same time
     n433
 5. careful when constructing a graph, could be a root node, could be matrix or dictionaries

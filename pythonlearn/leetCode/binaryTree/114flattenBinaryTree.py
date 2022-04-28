@@ -73,7 +73,4 @@ class Solution3:
             lefttail.right = root.right
             root.right = root.left
             root.left = None
-        return righttail if righttail else lefttail
-
-
-
+        return righttail if righttail else None

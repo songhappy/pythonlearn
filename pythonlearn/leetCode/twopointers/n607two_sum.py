@@ -1,28 +1,43 @@
+class Solution0(object):
+    def twoSum(self, nums, target):
+        dict = {}
+        for i in range(len(nums)):
+            diff = target - nums[i]
+            if diff in dict.keys():
+                return [i, dict[diff]]
+            dict[nums[i]] = i
+        return []
+
+
+# 170
 class TwoSum:
-    """
-    @param number: An integer
-    @return: nothing
-    """
 
     def __init__(self):
+        """
+        Initialize your data structure here.
+        """
         self.counter = {}
 
-    def add(self, number):
+    def add(self, number: int) -> None:
+        """
+        Add the number to an internal data structure..
+        """
         self.counter[number] = self.counter.get(number, 0) + 1
 
-    """
-    @param value: An integer
-    @return: Find if there exists any pair of numbers which sum is equal to the value.
-    """
-
-    def find(self, value):
+    def find(self, value: int) -> bool:
+        """
+        Find if there exists any pair of numbers which sum is equal to the value.
+        """
+        flag = False
         for ele in self.counter:
-            if ele == value - ele:
-                return self.counter[ele] >= 2
+            if ele + ele == value:
+                if self.counter[ele] >= 2:
+                    return True
             elif value - ele in self.counter:
                 return True
 
         return False
+
 
 #608 sorted, does not care about duplicates
 class Solution1:

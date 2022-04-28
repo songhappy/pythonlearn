@@ -20,8 +20,8 @@ class Solution:
         while left < right:
             if s[left] != s[right]:
                 return left, right
-        left += 1
-        right -= 1
+            left += 1
+            right -= 1
         return left, right
 
     def is_palindrome(self, s, left, right):
