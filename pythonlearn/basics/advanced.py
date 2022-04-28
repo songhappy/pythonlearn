@@ -53,7 +53,7 @@ def build_policy(env, policy_network, value_work=None):
               policy = PolicyWithValue(env=env)
               pass
               return policy
-       return policy_fn()
+       return policy_fn()  # eventually return the policy
 
 
 
@@ -173,7 +173,7 @@ for i in my_generator:
 with open("file.txt", "w") as file:
        file.write("hello")
 
-# lumbda function
+# lambda function
 # lambda arguments: expression, usually used only once in the code or as argument for sorted, map, filter and reduce
 mult = lambda x,y: x*y
 mult(5,10)
@@ -204,7 +204,7 @@ a = secrets.choice(mylyst)
 print(a)
 
 import numpy as np
-np.random.seed(1)  # reduceable
+np.random.seed(1)  # reproduceable
 a = np.random.rand(3)
 print(a)
 a = np.random.randint(0,10,(3,4))
@@ -213,4 +213,11 @@ arr = np.array([[1,2,3],[4,5,6],[7,8,9]])
 print(arr)
 np.random.shuffle(arr)
 print(arr)
+
+## format
+print(f'{x:02} {x * x:3} {x * x * x:4}')
+# 09  81  729
+time1= time.time()
+time2 = time.time()+ 10
+print(f"perf training time: {(time2 - time1):.2f}")
 

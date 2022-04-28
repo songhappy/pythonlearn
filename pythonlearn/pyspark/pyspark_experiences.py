@@ -5,10 +5,10 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, udf, array, broadcast, log, explode, struct, collect_list,\
     rank, row_number, percent_rank, max as spark_max
 from pyspark.sql.window import Window
-from useful_utils import *
  # pass a udf_function to a method
 from pyspark.sql.types import StructType, StringType, IntegerType, StructField, ArrayType
 import math
+# from pythonlearn.basics.useful_utils import *
 
 # start soark from python program
 """SimpleApp.py"""

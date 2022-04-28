@@ -3,5 +3,5 @@ bigdl.log
 pythonlearn/data
 pythonlearn/tfmodels/save_model/*
 pythonlearn/tfmodels/save_graph/*
-pythonlearn/zoomodels/save_graph/*
-pythonlearn/zoomodels/save_model/*
+pythonlearn/bigdlmodels/save_graph/*
+pythonlearn/bigdlmodels/save_model/*

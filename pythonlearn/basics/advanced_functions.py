@@ -1,12 +1,11 @@
 #1. return a function
-import tensorflow as tf
 def func1():
     def func2(x):
         return x+1
     return func2
 new_func = func1()
-x = (2)
-print(x)
+func1()(1)
+new_func(1)
 
 def func3(x):
     return x

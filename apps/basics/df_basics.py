@@ -1,17 +1,20 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
+# %%
+# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html
+# https://mp.weixin.qq.com/s/k6vzdHdVhGCxCBnslaD25g
 
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
+import sys
 
 input_path = "../../data/movielens/ml-1m/ratings.dat"
 
 
-# In[2]:
+# filter
+# agg
+# time
+# string
+# %%
 
 
 ratings = []
@@ -24,102 +27,47 @@ with open(input_path) as infile:
     print("total records:", cnt)
 
 df = pd.DataFrame(ratings, columns=['uid', 'mid', 'rate', 'timestamp'])
-
-
-# In[19]:
-
-
-df.head() 
-
-
-# In[4]:
-
-
-df[['uid']].apply(pd.Series.value_counts).sort_values('uid') 
-df[['mid']].apply(pd.Series.value_counts).sort_values('mid')
-
-
-# In[5]:
-
-
-df.groupby('rate').count().plot()
-
-
-# In[6]:
-
-
-import numpy as np
-df[['mid', 'rate']].groupby('mid').agg(np.mean)
-
-
-# In[7]:
-
-
-df[['uid', 'rate']].groupby('uid').agg(np.mean)
-
-
-# In[8]:
-
-
-rate=df['rate']
-rate.describe()
-
-
-# In[9]:
-
-
-df.loc[1]
-
-
-# In[10]:
-
-
-df['uid'][0:10]
-
-
-# In[10]:
-
-
-get_ipython().run_cell_magic('time', '', "df1user = df[df['uid']==1]\ndf1user.head()")
-
-
-# In[73]:
-
-
-df['date']=pd.to_datetime(df['timestamp'], unit = 's').dt.date
 df.head()
 
+df[['uid']].apply(pd.Series.value_counts).sort_values('uid')
+df[['mid']].apply(pd.Series.value_counts).sort_values('mid')
 
-# In[93]:
+df.groupby('rate').count().plot()
+import numpy as np
+df[['mid', 'rate']].groupby('mid').agg(np.mean)
+df[['uid', 'rate']].groupby('uid').agg(np.mean)
+#df["count"]=df[['uid', 'mid']].groupby('uid').count()
+print(df.head(10))
 
+rate=df['rate']
+print(rate.describe())
+
+
+print(df.loc[1])
+
+
+print(df['uid'][0:10])
+
+print("mean---------")
+print((df["rate"].mean()))
+
+df['date']=pd.to_datetime(df['timestamp'], unit = 's').dt.date
+print(df.head())
 
 df1 = df.sort_values(['uid', 'timestamp']).groupby(['uid', 'date'], as_index=False).agg(lambda x: list(x)).drop('timestamp', 1)
 
 df1['sess_len'] = df1['mid'].map(len)
-df1['sessid'] = range(1, len(df1) +1)
-df1.head()
+df1['sessid'] = range(0, len(df1))
+print(df1.head(100))
+print(df1.iloc[20])
 
-
-# In[61]:
-
-
-df1[['count']].plot()
-
-
-# In[68]:
-
-
-df1['count'].describe()
-
-
-# In[90]:
-
-
-df1.iloc[20]
-
-
-# In[ ]:
-
-
-
+length_sum = sum(df1['sess_len'])
+print(length_sum)
+probability = np.array(df1['sess_len'].apply(lambda x: x/length_sum))
+print(probability)
+import random
+import numpy
+for i in range(5):
+    ssid= random.choices(range(len(df1)), probability)
+    print(ssid[0])
 

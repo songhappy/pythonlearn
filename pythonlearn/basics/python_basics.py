@@ -48,19 +48,6 @@ len(a)
 int(3.0); float(4); print(str(a))
 
 
-# collections.deque, based on doublely linked list
-import collections
-a = collections.deque([1, 2, 3, 4, 5])
-a = collections.deque(maxlen=3) #it will popleft automatically when it reaches 3
-a.copy()
-a.append(6) #o(1)
-a.appendleft(0) #o(1)
-a.pop() #o(1)
-a.popleft() #o(1)
-a.extend([7,8,9]) #o(k)
-a.remove(2) #o(n)
-print(a.index(3))
-
 #tuples, can not change elements
 a = (1,2,3)
 print(a.index(1)) #index of value
@@ -136,36 +123,37 @@ print("4--------")
 for line in lines:
     print(line)
 
-#read as csv into dataframe
-import pandas
-try:
-    df= pandas.read_csv("./data/WF1_632822_20181120.txt")
-except Exception as e:
-    print("problem in reading files")
-
-# dump and load objects, should be larger than the demofile1
-import pickle
-X_file = open(path0 +"demofile2.txt", 'rb')
-#pickle.dump(X, X_file)
-X = pickle.load(X_file)
-print(X)
-
-#pyspark read and write textfile
-# rdd.coalesce(1).saveAsTextFile(...)
-# users = sc.textFile("/tmp/movielens/ml-1m/users.dat") \
-#     .map(lambda l: l.split("::")[0:4])\
-#     .map(lambda l: (int(l[0]), l[1], int(l[2]), int(l[3])))\
-#
-
-#peopleDF = spark.read.json("examples/src/main/resources/people.json")
-
-# DataFrames can be saved as Parquet files, maintaining the schema information.
-# peopleDF.write.parquet("people.parquet")
-#
-# # Read in the Parquet file created above.
-# # Parquet files are self-describing so the schema is preserved.
-# # The result of loading a parquet file is also a DataFrame.
-# parquetFile = spark.read.parquet("people.parquet")
 
 
+# collections.deque, based on doublely linked list
+import collections
+a = collections.deque([1, 2, 3, 4, 5])
+a = collections.deque(maxlen=3) #it will popleft automatically when it reaches 3
+a.copy()
+a.append(6) #o(1)
+a.appendleft(0) #o(1)
+a.pop() #o(1)
+a.popleft() #o(1)
+a.extend([7,8,9]) #o(k)
+a.remove(8) #o(n)
+print(a.index(9))
 
+
+# collections
+import collections
+d = collections.OrderedDict()
+d['a'] = 'A'
+d['b'] = 'B'
+d['c'] = 'C'
+d['d'] = 'D'
+d['e'] = 'E'
+print(list(d.values())[0])
+
+
+import heapq
+li = [5, 7, 9, 1, 3]
+heapq.heapify(li)
+print(list(li))
+print(li)
+li.remove(5) #o(n)
+print(li)

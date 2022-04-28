@@ -1,4 +1,4 @@
-# Python CheetSeet
+# Python experiences
 ### outline
 1. basic concepts, numbers, data structures,files in and out
 2. useful libraries, numpy, scipy, pandas, scikit-learn
@@ -49,31 +49,24 @@ Annaconda, conda install other packages
 pip install pyopenssl   or use python3
 ```
 
-## python basic concepts
-### some syntax and wrappers
-```python
-class Foo:
-    "this is a test"
-    def __init__(self):
-        self._a = 0 #_variable name means private menber of the class
-        self._b = 1
-    def __call__(self, a): #call an instance as method
-        print(a)
-foo = Foo()
-print(__name__) # __name__ is assigned by python interpretor when it reads a source file at that level
+5. from matplotlib import pyplot as plt 
+   just does not work for py36tf1, works well for py36tf2
 
-class EnvCore:  
-    pass
-class Env(gym.Env): # it is a wrapper of EnvCore
-    def __init__(self):
-        self._env = EnvCore()
-    def step(self, action):
-        pass
+6. add memory for spark in python module
+```bash 
+    export _JAVA_OPTIONS="-Xms512m -Xmx1024m"
+```
+
+```python
+    from zoo import init_spark_on_local
+    conf = {"spark.executor.memory":"20g","spark.driver.memory":"20g"}
+    sc = init_spark_on_local(cores=8, conf=conf)
 ```
 
 ### python numbers
 int, float and complex how many bytes per each number
 ```python
+a=5
 print(type(a))
 print(isinstance(a, int))
 import sys
@@ -179,136 +172,6 @@ X_file = open(path0 +"demofile2.txt", 'r')
 X = pickle.load(X_file)
 ```
 
-## python libs with a focus on pandata for quick analysis
-example:
-file:///Users/guoqiong/intelWork/projects/travelSky/shane/TravelSky_apachelog_full.html
-https://github.com/pandas-dev/pandas/blob/master/doc/cheatsheet/Pandas_Cheat_Sheet.pdf
-https://chrisalbon.com/python/data_wrangling/pandas_join_merge_dataframe/
-https://jakevdp.github.io/PythonDataScienceHandbook/04.14-visualization-with-seaborn.html
-https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html
-basic plot and resample to take a look at data
-
-### create data frame 
-```python
-# from csv file
-log_df = pd.read_csv("log.csv") #load csv into dataframe
-# from numpy matrix
-pd.DataFrame(np.random.randn(10, 5))
-d = {'col1': ts1, 'col2': ts2}
-df = pd.DataFrame(data=d, index=index)
-```
-### Basic operations
-```python
-pd.DataFrame.from_csv(“csv_file”)
-pd.read_csv(“csv_file”)
-data = pd.read_csv('output_list.txt', sep=" ", header=None)
-data.columns = ["a", "b", "c", "etc."]
-pd.read_excel("excel_file")
-df.to_csv("data.csv", sep=",", index=False)
-df.info()
-print(df.describe())
-df.columns 
-df.dropna(axis=0, how='any')
-df.replace(to_replace=None, value=None)
-pd.isnull(object)
-df.drop('feature_variable_name', axis=1)
-pd.to_numeric(df["feature_name"], errors='coerce') #to float
-df.as_matrix()  %to numpy matrix
-df.head(n)
-df.loc[feature_name]
-pd.melt(df) #columns into rows  
-pd.pivot(df) #rows into columns
-```
-
-### DataFrame operations
-```python
-df["height"].apply(*lambda* height: 2 * height)
-def multiply(x):
- return x * 2
-df["height"].apply(multiply)
-df.rename(columns = {df.columns[2]:'size'}, inplace=True)
-df["name"].unique()
-new_df = df[["name", "size"]]
-```
-### summarize and sort
-```python
-# Sum of values in a data frame
-df.sum()
-# Lowest value of a data frame
-df.min()
-# Highest value
-df.max()
-# Index of the lowest value
-df.idxmin()
-# Index of the highest value
-df.idxmax()
-# Statistical summary of the data frame, with quartiles, median, etc.
-df.describe()
-# Average values
-df.mean()
-# Median values
-df.median()
-# Correlation between columns
-df.corr()
-# To get these values for only one column, just select it like this#
-df["size"].median()
-
-df.sort_values(ascending = False)
-
-df.loc([0], ['size'])
-```
-run basic queries 
-```
-users.query('occupation=="writer"')
-#filter
-df[df["size"] == 5]
-```
-example
-```python
-import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-%matplotlib inline
-sns.set_style("whitegrid")
-df = pd.read_csv("log.csv") #load csv into dataframe
-df = pd.read_excel("test.exel")
-df.to_csv("out_file)
-df.head()
-df.info()
-print(df.describe())
-from dateutil import parser
-df.groupby('host').agg('count')
-df.replace(to_replace=None, value= None)
-df['processed_date'] = df['logDate'].str.replace(':', ' ', 1).str.replace(r'\[|\]', '')
-#add a column and set index for plot
-one_ip_sample_df = df[df['host'] == '122.119.64.67']
-one_ip_sample_df['dt_index'] = pd.to_datetime(one_ip_sample_df['processed_date'])
-one_ip_sample_df = one_ip_sample_df.set_index('dt_index')
-def resample_plot(df,freq,col='value'):
-    resample_df = df[col].resample(freq).mean().fillna(value=0)
-    resample_df.plot()
-resample_plot(one_ip_sample_df,'30Min')
-
-#plot original values and resampled values in the same figure
-new_df_1['in_value_min'].plot()
-resample_plot(new_df_1,'1D',col='in_value_min')
-plt.legend(['sampling freq = 1 hour(original)','sampling freq = 1 day'])
-plt.title("in_value_min");
-```
-
-## pyspark and related
-
-### add memory for spark in python module
-```bash 
-    export _JAVA_OPTIONS="-Xms512m -Xmx1024m"
-```
-
-```python
-    from zoo import init_spark_on_local
-    conf = {"spark.executor.memory":"20g","spark.driver.memory":"20g"}
-    sc = init_spark_on_local(cores=8, conf=conf)
-```
 
 ### pyspark create dataframe 
 ````python
@@ -357,5 +220,3 @@ df = spark.createDataFrame(pdf)
 ```
 
 ## connecting to scala and jvm
-
-

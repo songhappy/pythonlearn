@@ -1,4 +1,5 @@
 # the first dimention is batch size
+from sklearn.metrics import roc_auc_score, accuracy_score
 import tensorflow as tf
 y_true = [[0., 1.], [0., 0.]]
 y_pred = [[1., 1.], [1., 0.]]
@@ -10,3 +11,6 @@ print(x)
 m = tf.keras.metrics.AUC()
 m.update_state([0, 0, 1, 1], [0, 0.5, 0.3, 0.9])
 print(m.result().numpy())
+
+sk_auc = roc_auc_score([0, 0, 1, 1], [0, 0.5, 0.3, 0.9])
+print(sk_auc)
