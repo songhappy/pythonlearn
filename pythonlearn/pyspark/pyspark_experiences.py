@@ -348,7 +348,6 @@ def udf_functions(spark):
     #         else:
     #             raise ValueError('only int, list[int], and list[list[int]] are supported.')
     #         return values
-    #
     #     df = self.df
     #     for c in key_cols:
     #         col_type = df.schema[c].dataType
