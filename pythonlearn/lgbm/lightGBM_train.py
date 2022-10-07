@@ -32,6 +32,7 @@ sc = init_orca_context("local")
 spark = OrcaContext.get_spark_session()
 train = FeatureTable.read_parquet(input_path + "/train").repartition(10)
 test = FeatureTable.read_parquet(input_path + "/test").repartition(10)
+
 train = train.cache()
 test = test.cache()
 print("training size:", train.size())

@@ -36,7 +36,7 @@ spark_conf = {"spark.app.name": "recsys-lightGBM",
 
 
 input_path = "/home/arda/intelWork/data/bankruptcy/data.csv"
-sc = init_orca_context("local", conf=spark_conf)
+sc = init_orca_context("local", conf=spark_conf, cores=32)
 spark = OrcaContext.get_spark_session()
 df = (
     spark.read.format("csv")
@@ -47,7 +47,7 @@ df = (
 print("records read: " + str(df.count()))
 print("Schema: ")
 df.printSchema()
-train, test = df.randomSplit([0.85, 0.15], seed=1)
+train, test = df.randomSplit([0.50, 0.50], seed=1)
 
 from pyspark.ml.feature import VectorAssembler
 feature_cols = df.columns[1:]
@@ -57,7 +57,7 @@ test = featurizer.transform(test)["Bankrupt?", "features"]
 
 from synapse.ml.lightgbm import LightGBMClassifier
 
-estimator = LightGBMClassifier(objective="binary", featuresCol="features", labelCol="Bankrupt?", isUnbalance=True)
+estimator = LightGBMClassifier(objective="binary", featuresCol="features", labelCol="Bankrupt?")
 
 estimator.setNumIterations(100)
 estimator.setObjective("binary")

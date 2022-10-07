@@ -51,6 +51,8 @@ gbm.save_model('model.txt')
 print('Starting predicting...')
 # predict
 y_pred = gbm.predict(X_test)
+auc = roc_auc_score(y_test, y_pred)
+
 # rounding the values
 y_pred = y_pred.round(0)
 #converting from float to integer
@@ -59,7 +61,6 @@ y_pred=y_pred.astype(int)
 print(y_pred)
 acc = accuracy_score(y_test, y_pred)
 #roc_auc_score metric
-auc = roc_auc_score(y_pred,y_test)
 # eval
 print("AUC: %.2f" % (auc * 100.0))
 print("Accuracy: %.2f" % (acc * 100.0))

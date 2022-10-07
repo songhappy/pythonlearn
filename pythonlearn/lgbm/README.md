@@ -25,3 +25,23 @@ Accuracy: 99.40
 original_train:
 AUC: 99.70
 Accuracy: 99.70
+
+
+on movielens data
+lightgbm_train_movie:
+AUC: 66.64
+Accuracy: 57.21
+
+mlightgbm_train_movie:
+AUC: 67.99
+Accuracy: 55.88
+chunksize 10000, 
+AUC: 63.50
+Accuracy: 54.75
+chunchsize 100000,
+AUC: 80.08
+Accuracy: 73.08
+
+origin_train:
+AUC: 82.22
+Accuracy: 74.82

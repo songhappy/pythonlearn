@@ -38,7 +38,8 @@ df = (
 print("records read: " + str(df.count()))
 print("Schema: ")
 df.printSchema()
-train, test = df.randomSplit([0.85, 0.15], seed=1)
+df.show(10)
+train, test = df.randomSplit([0.20, 0.80], seed=1)
 from pyspark.ml.feature import VectorAssembler
 feature_cols = df.columns[1:]
 featurizer = VectorAssembler(inputCols=feature_cols, outputCol="features")

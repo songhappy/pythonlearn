@@ -12,14 +12,14 @@ import lightgbm as lgb
 print('Loading data...')
 # load or create your dataset)
 input_path = "/home/arda/intelWork/data/bankruptcy/data.csv"
-sc = init_orca_context("local")
+sc = init_orca_context("local", cores=2)
 spark = OrcaContext.get_spark_session()
 df = (spark.read.format("csv")
     .option("header", True)
     .option("inferSchema", True)
     .load(input_path))
 
-train, test = df.randomSplit([0.85, 0.15], seed=1)
+train, test = df.randomSplit([0.20, 0.80], seed=1)
 train = train.toPandas()
 test = test.toPandas()
 print(train.head())
@@ -59,6 +59,8 @@ gbm.save_model('model.txt')
 print('Starting predicting...')
 # predict
 y_pred = gbm.predict(X_test)
+auc = roc_auc_score(y_test, y_pred)
+
 # rounding the values
 y_pred = y_pred.round(0)
 #converting from float to integer
@@ -67,7 +69,6 @@ y_pred=y_pred.astype(int)
 print(y_pred)
 acc = accuracy_score(y_test, y_pred)
 #roc_auc_score metric
-auc = roc_auc_score(y_pred,y_test)
 # eval
 print("AUC: %.2f" % (auc * 100.0))
 print("Accuracy: %.2f" % (acc * 100.0))
