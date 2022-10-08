@@ -21,7 +21,7 @@ from bigdl.friesian.feature import FeatureTable
 from pyspark.ml.linalg import DenseVector, VectorUDT
 from pyspark.ml.evaluation import BinaryClassificationEvaluator, MulticlassClassificationEvaluator
 from sklearn.metrics import accuracy_score, roc_auc_score
-from bigdl.dllib.nnframes.nn_classifier import *
+from bigdl.dllib.nnframes.tree_model import *
 import argparse
 import time
 
@@ -84,56 +84,77 @@ if __name__ == '__main__':
     features = num_cols + [col + "_te_label" for col in cat_cols] +\
                [col + "_te_label" for col in embed_cols]
     begin = time.time()
-    train_tbl = FeatureTable.read_parquet(args.data_dir + "/train_parquet")\
-        .drop("tweet_timestamp", "enaging_user_account_creation", "reply_timestamp", "text_tokens",
-              "retweet_timestamp", "retweet_with_comment_timestamp", "like_timestamp")
-    test_tbl = FeatureTable.read_parquet(args.data_dir + "/test_parquet")\
-        .drop("tweet_timestamp", "enaging_user_account_creation", "reply_timestamp", "text_tokens",
-              "retweet_timestamp", "retweet_with_comment_timestamp", "like_timestamp")
-    train_tbl = train_tbl.cache()
-    test_tbl = test_tbl.cache()
-    full = train_tbl.concat(test_tbl)
+    # train_tbl = FeatureTable.read_parquet(args.data_dir + "/train_parquet")\
+    #     .drop("tweet_timestamp", "enaging_user_account_creation", "reply_timestamp", "text_tokens",
+    #           "retweet_timestamp", "retweet_with_comment_timestamp", "like_timestamp")
+    # test_tbl = FeatureTable.read_parquet(args.data_dir + "/test_parquet")\
+    #     .drop("tweet_timestamp", "enaging_user_account_creation", "reply_timestamp", "text_tokens",
+    #           "retweet_timestamp", "retweet_with_comment_timestamp", "like_timestamp")
+    # train_tbl = train_tbl.cache()
+    # test_tbl = test_tbl.cache()
+    # full = train_tbl.concat(test_tbl)
+    #
+    # full, min_max_dict = full.min_max_scale(num_cols)
+    # index_tbls = full.gen_reindex_mapping(embed_cols)
+    # full, target_codes = full.target_encode(cat_cols=cat_cols + embed_cols, target_cols=["label"])
+    #
+    # train = train_tbl.transform_min_max_scale(num_cols, min_max_dict)\
+    #     .reindex(embed_cols, index_tbls)\
+    #     .encode_target(target_cols="label", targets=target_codes)\
+    #     .merge_cols(features, "features") \
+    #     .select(["label", "features"])\
+    #     .apply("features", "features", lambda x: DenseVector(x), VectorUDT())
+    # train.show(5, False)
+    #
+    # test = test_tbl.transform_min_max_scale(num_cols, min_max_dict)\
+    #     .reindex(embed_cols, index_tbls)\
+    #     .encode_target(target_cols="label", targets=target_codes) \
+    #     .merge_cols(features, "features") \
+    #     .select(["label", "features"]) \
+    #     .apply("features", "features", lambda x: DenseVector(x), VectorUDT())
+    #
+    # test.show(5, False)
+    # print("training size:", train.size())
+    # train = train.cache()
+    # print("test size:", test.size())
+    # test = test.cache()
+    #
+    # train_tbl.uncache()
+    # test_tbl.uncache()
+    input_path = "/home/arda/intelWork/data/tweet/xgb_processed"
 
-    full, min_max_dict = full.min_max_scale(num_cols)
-    index_tbls = full.gen_reindex_mapping(embed_cols)
-    full, target_codes = full.target_encode(cat_cols=cat_cols + embed_cols, target_cols=["label"])
+    # input_path = "hdfs://172.16.0.105:8020/user/root/guoqiong/recsys2021/xgb_processed"
 
-    train = train_tbl.transform_min_max_scale(num_cols, min_max_dict)\
-        .reindex(embed_cols, index_tbls)\
-        .encode_target(target_cols="label", targets=target_codes)\
-        .merge_cols(features, "features") \
-        .select(["label", "features"])\
-        .apply("features", "features", lambda x: DenseVector(x), VectorUDT())
-    train.show(5, False)
+    train = FeatureTable.read_parquet(input_path + "/train").repartition(10)
+    test = FeatureTable.read_parquet(input_path + "/test").repartition(10)
 
-    test = test_tbl.transform_min_max_scale(num_cols, min_max_dict)\
-        .reindex(embed_cols, index_tbls)\
-        .encode_target(target_cols="label", targets=target_codes) \
-        .merge_cols(features, "features") \
-        .select(["label", "features"]) \
-        .apply("features", "features", lambda x: DenseVector(x), VectorUDT())
-
-    test.show(5, False)
-    print("training size:", train.size())
     train = train.cache()
-    print("test size:", test.size())
     test = test.cache()
-
-    train_tbl.uncache()
-    test_tbl.uncache()
-
+    print("training size:", train.size())
+    print("test size:", test.size())
     preprocess = time.time()
     print("feature preprocessing time: %.2f" % (preprocess - begin))
 
-    params = {"tree_method": 'hist', "eta": 0.1, "gamma": 0.1,
-              "min_child_weight": 30, "reg_lambda": 1, "scale_pos_weight": 2,
-              "subsample": 1, "objective": "binary:logistic"}
+    params1 = {"tree_method": 'auto',
+               "eta": 0.1,
+               "max_depth": 8,
+               "num_round": 500,
+               "min_child_weight": 100,
+               "objective": "binary:logistic"}
 
-    for eta in [0.05, 0.1, 0.15, 0.2]:
-        for max_depth in [4, 6, 8, 10]:
-            for num_round in [100, 200, 400]:
-                params.update({"eta": eta, "max_depth": max_depth, "num_round": num_round})
-                classifier = XGBClassifier(params)
+    params2 = {"tree_method": 'hist',
+               'grow_policy': 'lossguide',
+               "eta": 0.1,
+               "max_depth": 8,
+               "num_round": 500,
+               "min_child_weight": 100,
+               "objective": "binary:logistic"}
+
+    for eta in [0.05]:
+        for max_depth in [4]:
+            for num_round in [400]:
+                # params.update({"eta": eta, "max_depth": max_depth, "num_round": num_round})
+                classifier = XGBClassifier(params1)
                 xgbmodel = classifier.fit(train.df)
                 xgbmodel.setFeaturesCol("features")
                 predicts = xgbmodel.transform(test.df)

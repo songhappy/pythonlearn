@@ -75,7 +75,7 @@ params = {"objective": "binary",  'num_iterations': 100}
 
 from synapse.ml.lightgbm import LightGBMClassifier
 classifier = LightGBMClassifier(objective="binary", featuresCol="features", labelCol="label")
-classifier.setChunkSize(100000)
+classifier.setChunkSize(80000)
 
 model = classifier.fit(train.df)
 predictions = model.transform(test.df)

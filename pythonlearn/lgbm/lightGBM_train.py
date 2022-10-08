@@ -39,16 +39,14 @@ print("training size:", train.size())
 print("test size:", test.size())
 
 preprocess = time.time()
-params = {"boosting_type": "gbdt", "num_leaves": 70, "learning_rate": 0.3,
-          "min_data_in_leaf": 20, "objective": "binary",
-          'num_iterations': 10000,
-          'max_depth': 14,
-          'lambda_l1': 0.01,
-          'lambda_l2': 0.01,
-          'bagging_freq': 5,
-          'max_bin': 255,
-          'early_stopping_round': 20
-          }
+params = {
+    'objective': 'binary',
+    'num_leaves': 255,
+    'num_iterations': 500,
+    'learning_rate': 0.1,
+    'min_data_in_leaf': 0,
+    'min_sum_hessian_in_leaf': 100
+}
 
 params = {"objective": "binary",  'num_iterations': 100}
 

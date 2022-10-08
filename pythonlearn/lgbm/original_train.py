@@ -26,14 +26,12 @@ lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
 
 # specify your configurations as a dict
 params = {
-    'boosting_type': 'gbdt',
     'objective': 'binary',
-    'num_leaves': 31,
-    'learning_rate': 0.05,
-    'feature_fraction': 0.9,
-    'bagging_fraction': 0.8,
-    'bagging_freq': 5,
-    'verbose': 0
+    'num_leaves': 255,
+    'num_iterations': 200,
+    'learning_rate': 0.1,
+    'min_data_in_leaf': 0,
+    'min_sum_hessian_in_leaf': 100
 }
 
 params = {"objective": "binary", 'num_iterations': 100}

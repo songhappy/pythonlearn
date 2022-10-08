@@ -31,16 +31,25 @@ on movielens data
 lightgbm_train_movie:
 AUC: 66.64
 Accuracy: 57.21
+lightgbm_train_movie dist_3_l10
+AUC: 82.52
+Accuracy: 75.09
 
 mlightgbm_train_movie:
 AUC: 67.99
+chunksize 1000,
 Accuracy: 55.88
-chunksize 10000, 
-AUC: 63.50
-Accuracy: 54.75
+AUC: 51.15
+Accuracy: 50.68
+chunksize 10000,                                                                                 AUC: 79.80
+AUC: 79.80
+Accuracy: 72.51
 chunchsize 100000,
 AUC: 80.08
 Accuracy: 73.08
+chunksize 1000000
+AUC: 82.27
+Accuracy: 74.82
 
 origin_train:
 AUC: 82.22
