@@ -18,3 +18,6 @@ url = "https://huggingface.co/datasets/huggingface/documentation-images/resolve/
 # object_detector = pipeline('object-detection')
 # detected = object_detector(image)
 # print(detected)
+
+
+from datasets import load_dataset

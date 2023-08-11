@@ -143,22 +143,30 @@ print(a.index(9))
 
 # collections
 import collections
-
+# OrderedDict preserves the order in which the keys are inserted.
+# A regular dict doesn’t track the insertion order and iterating it gives the values in an arbitrary order.
 d = collections.OrderedDict()
 d['a'] = 'A'
 d['b'] = 'B'
 d['c'] = 'C'
 d['d'] = 'D'
 d['e'] = 'E'
+for k,v in d.items():
+    print(k, v)
+d.pop('e')
+for k,v in d.items():
+    print(k, v)
 print(list(d.values())[0])
 
 import heapq
 
 li = [5, 7, 9, 1, 3]
 heapq.heapify(li)  # O(n) 把一个List 搞成min heap
-heapq.heappush(10)  # O(lgn) push 一个item to list, maintain heap property
+heapq.heappush(li, 10)  # O(lgn) push 一个item to list, maintain heap property
 heapq.heappop(li)  # O(lgn) 从这个li heap 中pop 最上面的，maintain heap property
 print(list(li))
 print(li)
 li.remove(5)  # o(n)
+print(li)
+print(heapq.heappushpop(li, 12))
 print(li)
