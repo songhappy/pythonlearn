@@ -14,10 +14,10 @@ class Solution:
         # write your code here
         if not root:
             return []
-        inorder = [root.val]
+        current = [root.val]
         left = self.inorderTraversal1(root.left)
         right = self.inorderTraversal1(root.right)
-        return left + inorder + right
+        return left + current + right
 
     def inorderTraversal2(self, root):
         self.inorder = []
@@ -43,7 +43,7 @@ class Solution:
                 curr = curr.left
             curr = stack.pop()
             result.append(curr.val)
-        curr = curr.right
+            curr = curr.right
         return result
 
 

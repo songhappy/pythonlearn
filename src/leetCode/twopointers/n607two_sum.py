@@ -75,12 +75,16 @@ class Solution:
 
         left, right = 0, len(nums) - 1
         while left < right:
-            sumtwo = nums[left] + nums[right]
-            if sumtwo == target:
+            the_sum = nums[left] + nums[right]
+            if the_sum == target:
                 pairs.append((nums[left], nums[right]))
                 left += 1
                 right -= 1
-            elif sumtwo > target:
+                while left < right and nums[left] == nums[left-1]:
+                    left = left + 1
+                while left < right and nums[right] == nums[right + 1]:
+                    right = right - 1
+            elif the_sum > target:
                 right -= 1
             else:
                 left += 1
