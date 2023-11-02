@@ -1,7 +1,7 @@
 debug.log
 bigdl.log
-pythonlearn/data
-pythonlearn/tfmodels/save_model/*
-pythonlearn/tfmodels/save_graph/*
-pythonlearn/bigdlmodels/save_graph/*
-pythonlearn/bigdlmodels/save_model/*
+src/data
+src/tfmodels/save_model/*
+src/tfmodels/save_graph/*
+src/bigdlmodels/save_graph/*
+src/bigdlmodels/save_model/*

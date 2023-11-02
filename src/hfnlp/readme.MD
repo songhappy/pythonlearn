@@ -1,3 +1,5 @@
+https://huggingface.co/learn/nlp-course/chapter1/1
+
 https://github.com/huggingface/transformers/tree/main/examples/pytorch/text-classification
 https://github.com/tloen/alpaca-lora/blob/main/finetune.py
 
