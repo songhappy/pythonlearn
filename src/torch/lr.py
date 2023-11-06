@@ -58,6 +58,15 @@ for epoch in range(num_epochs):
     loss.backward()
     optimizer.step()
 
+    print("****** weight grad")
+    for name, param in model.named_parameters():
+        print(name, param.grad)    
+    
+    print("*******x gradient")
+    print(X_train.grad)
+
+    print("*******y gradient")
+    print(y_pred.grad)
     # zero grad before new step
     optimizer.zero_grad()
 
