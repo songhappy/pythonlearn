@@ -4,7 +4,6 @@ import xgboost as xgb
 from sklearn import preprocessing
 
 def get_df(file_name):
-    file_name = "/Users/guoqiong/life/invest/stock/yahoo_data/etf.txt"
     df_org = pd.read_csv(file_name)
     print(df_org[:5])
     # print(df_org[-5:])

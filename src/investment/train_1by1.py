@@ -12,7 +12,7 @@ testdatasize = 100
 unroll_length = 15
 label_vars = ['spx_close', 'ixic_close', 'dji_close', 'iwm_close',
               'soxx_close']
-yahoo_etf_input = "/Users/guoqiong/life/invest/stock/yahoo_data/etf.txt"
+yahoo_etf_input ="/home/arda/intelWork/data/yahoo_stock/yahoo_data.csv"
 
 def attention_one(x_train, y_train, x_test, y_test, features):
     shape = features.shape
