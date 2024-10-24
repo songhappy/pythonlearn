@@ -314,13 +314,16 @@ model = torch.load('model.pth', weights_only=False),
 # Model parallelism is a technique to distribute the model across multiple GPUs and perform parallel computations.
 # PyTorch provides the torch.nn.parallel module to handle model parallelism.
 # https://pytorch.org/tutorials/intermediate/model_parallel_tutorial.html
+# see model_parallel.py in this repo
 
 # 3. Distributed Training
 # Distributed training is a technique to train a model across multiple devices, machines, or nodes.
 # PyTorch provides the torch.nn.parallel.DistributedDataParallel module to handle distributed training.
 # https://pytorch.org/tutorials/intermediate/ddp_tutorial.html
+# see distributed_training.py in this repo
 
 # 4. Serving Models
 # Serving models is the process of deploying a trained model for inference in production environments.
 # PyTorch provides the torch.jit module to compile and optimize models for serving.
 # https://pytorch.org/tutorials/advanced/cpp_export.html
+# see serving_model.py in this repo
